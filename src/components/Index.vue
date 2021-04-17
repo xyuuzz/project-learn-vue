@@ -18,7 +18,8 @@
             </p>
           </div>
 
-          <div class="batas pt-1 pb-1 bg-secondary mt-3 mb-3"></div>
+          <!--Pembatas-->
+          <div class="pt-1 pb-1 bg-secondary mt-3 mb-3"></div>
 
           <h4 class="text-light ml-3 mb-3">Daftar Notes : </h4>
           <div style="height:65vh; overflow-y: scroll;">
@@ -30,7 +31,7 @@
         </div>
 
         <div class="col-md-9" >
-          <CreateNote :propCreateNote="createNote" :propDataNote="dataNote"/>  <!-- value dari dataNote akan dikirim ke propDataNote di CreateNote.vue -->
+          <CreateNote :propCreateNote="createNote" :propDataNote="dataNote" :propUpdateNote="updateNote" :propDeleteNote="deleteNote" />  <!-- value dari dataNote akan dikirim ke propDataNote di CreateNote.vue -->
           <!-- kita membuat props(properti) propCreateNote yang akan ditangkap oleh file CreateNote -->
         </div>
     </div>
@@ -52,18 +53,26 @@ export default {
 
     data: function() {
         return {
-          notes: [{id:1, title: "contoh1", description: "deskripsi contoh1"}],
-          editNotes: {},
-          dataNote: {}
+          notes: [], // tempat untuk data note
+          editNotes: {}, // wadah untuk data edit note, sebelum dimasukan ke notes
+          dataNote: {} // data untuk note
         }
     },
 
     methods: {
       newNote: function() {
           // ini adalah method untuk menambahkan note baru
+          this.dataNote = {id:0, title: '', description: ''};
       },
       createNote: function(title, description) { // disini kita menerima parameter data yang dikirimkan oleh CreateNote...
-        let newNote = {"id" : this.notes.length + 1, "title" : title, "description" : description};
+        let id_note;
+        if(this.notes.length === 0) {
+          id_note = 1;
+        } else {
+          id_note = this.notes.length + 1
+        }
+
+        let newNote = {"id" : id_note + 1, "title" : title, "description" : description};
 
         this.notes.push(newNote);
       },
@@ -71,6 +80,17 @@ export default {
         this.editNotes = this.notes.find(note => note.id == id); // lalu kita mencari object mana yang cocok dengan id list note yang di klik oleh user.
 
         this.dataNote = this.editNotes; // lalu kita assign nilai dari editNotes diatas ke dataNote
+      },
+      updateNote: function(id, title, description) {
+        // mencari index menggunakan id yang diterima.
+        let data_index = this.notes.findIndex(note => note.id == id);
+
+        // untuk mengupdate notes dengan index data yang ingin di update
+        this.notes[data_index] = {id: id, title: title, description: description};
+      },
+      deleteNote: function(id) {
+        let data_index = this.notes.findIndex(note => note.id == id);
+        this.notes.splice(data_index, 1);
       }
 
     }

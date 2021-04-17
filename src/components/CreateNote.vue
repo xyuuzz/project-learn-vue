@@ -3,11 +3,12 @@
     <form action="#" method="post" @submit="SubmitNote">
         <div class="header mt-3">
             <div class="float-right mb-4">
-                <button type="button" class="btn btn-danger mr-3">Delete</button>
+                <button type="button" class="btn btn-danger mr-3" @click="deleteNote">Delete</button>
                 <button type="submit" class="btn btn-success mr-5">Save</button>
             </div>
         </div>
         <div class="form">
+                <input type="text" name="id" hidden v-model="id">
                 <input type="text" id="title" class="font-weight-bold form-control bg-light text-black position-relative" placeholder="Judul Note" v-model="title" required >
                 <label for="title" id="labelTitle" hidden>
                     <p class="mt-1 text-secondary position-absolute font-weight-bold">Judul HTML</p>
@@ -32,10 +33,17 @@ export default {
         },
         propDataNote: { // lalu data yang dikirimkan diterima dalam bentuk object
             type: Object
+        },
+        propUpdateNote: function() {
+
+        },
+        propDeleteNote: function() {
+
         }
     },
     data: function() {
         return {
+            "id" : '',
             "title" : '',
             "description" : ''
         }
@@ -43,13 +51,29 @@ export default {
     methods: {
         SubmitNote: function(event) {
             event.preventDefault();
-            // disini kita mengirim argument ke Index.vue dengan perantara propCreateNote
-            this.propCreateNote(this.title, this.description);
+
+            if(this.id == 0) {
+                // disini kita mengirim argument ke Index.vue dengan perantara propCreateNote
+                this.propCreateNote(this.title, this.description);
+                this.resetInput();
+            } else {
+                this.propUpdateNote(this.id, this.title, this.description);
+            }
         },
+        deleteNote: function() {
+            this.propDeleteNote(this.id);
+            this.resetInput();
+        },
+        resetInput() {
+            this.id = 0;
+            this.title = '';
+            this.description = '';
+        }
     },
     watch: { 
         // watch => ketika kita mengubah nilai dari property milik CreateVue, maka nilai yang diubah akan langsung di update oleh watch ini, sehingga ketika kita mengeklik list note, lalu id dari list note tsb diterima oleh Index.vue, lalu Index.vue mengirim object list note sesuai id yang dikirim oleh ListNotes, lalu object list note valuenya akan menjadi isi dari title dan description dari form... 
         propDataNote: function(note) {
+            this.id = note.id; // data akan langsung diubah karena menggunakan watch
             this.title = note.title; // data akan langsung diubah karena menggunakan watch
             this.description = note.description;
         }
